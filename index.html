@@ -154,6 +154,102 @@
             background-size: 200% 100%;
             animation: shimmer 2s linear infinite;
         }
+
+        /* ===== SUITES SECTION RESPONSIVE FIXES ===== */
+
+        /* Ensure all elements respect viewport width */
+        * {
+            box-sizing: border-box;
+        }
+
+        /* Suite image container - responsive sizing */
+        .suite-image-container {
+            width: 100%;
+            max-width: 100%;
+            height: auto;
+            min-height: 250px;
+        }
+
+        /* Mobile-first: Stack content vertically */
+        @media (max-width: 1023px) {
+            .suite-article {
+                flex-direction: column !important;
+            }
+
+            .suite-image-container,
+            .suite-content {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+
+            .suite-content {
+                padding-left: 0 !important;
+                padding-right: 0 !important;
+            }
+        }
+
+        /* Tablet adjustments */
+        @media (min-width: 768px) and (max-width: 1023px) {
+            .suite-image-container {
+                min-height: 350px;
+            }
+        }
+
+        /* Very small screens - extra tight spacing */
+        @media (max-width: 480px) {
+            .suite-article {
+                gap: 1rem !important;
+            }
+
+            .suite-image-container {
+                min-height: 220px;
+            }
+
+            /* Tighten amenities grid */
+            .amenities-grid {
+                gap: 0.375rem !important;
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+
+            .amenities-grid>div {
+                font-size: 0.75rem !important;
+            }
+
+            .amenities-grid .material-symbols-outlined {
+                font-size: 1rem !important;
+            }
+
+            /* Smaller overlay badges on mobile */
+            .suite-badge {
+                font-size: 0.65rem !important;
+                padding: 0.25rem 0.5rem !important;
+            }
+
+            .suite-gallery-btn {
+                padding: 0.375rem 0.625rem !important;
+                font-size: 0.65rem !important;
+            }
+        }
+
+        /* Prevent horizontal scroll - overflow protection */
+        @media (max-width: 768px) {
+            .suites-main-container {
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+            }
+        }
+
+        /* Ultra-small screens (320px) */
+        @media (max-width: 360px) {
+            .suites-main-container {
+                padding-left: 0.75rem !important;
+                padding-right: 0.75rem !important;
+            }
+
+            .amenities-grid {
+                grid-template-columns: 1fr !important;
+            }
+        }
     </style>
 </head>
 
@@ -521,30 +617,30 @@
                         </div>
                     </section>
 
-                    <main className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+                    <main className="suites-main-container mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
                         <div id="rooms" className="mb-20 text-center max-w-3xl mx-auto">
                             <h2 className="text-3xl font-bold tracking-tight mb-4 text-[#0d1b0d] dark:text-white">Our Exclusive Suites</h2>
                             <p className="text-gray-600 dark:text-gray-400">
                                 Each of our units is thoughtfully appointed with modern amenities to ensure your stay is as relaxing as possible. Enjoy private entrances, premium linens, and serene views.
                             </p>
                         </div>
-                        <article className="group mb-16 md:mb-24 flex flex-col gap-6 md:gap-12 lg:flex-row lg:items-start">
-                            <div className="relative w-full lg:w-1/2 max-w-full overflow-hidden rounded-2xl shadow-xl aspect-[4/3]">
+                        <article className="suite-article group mb-16 md:mb-24 flex flex-col gap-6 md:gap-12 lg:flex-row lg:items-start">
+                            <div className="suite-image-container relative w-full lg:w-1/2 max-w-full overflow-hidden rounded-2xl shadow-xl aspect-[4/3]">
                                 <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors duration-500 z-10"></div>
                                 <div className="h-full w-full bg-cover bg-center transition-transform duration-700 group-hover:scale-105" style={{ backgroundImage: 'url("double-room.jpg")' }}>
                                 </div>
                                 <div className="absolute top-3 left-3 md:top-4 md:left-4 z-20">
-                                    <span className="bg-white/90 backdrop-blur px-2 py-1 md:px-3 md:py-1.5 rounded-lg text-xs md:text-sm font-bold text-gray-900 shadow-md">Size: 20 m²</span>
+                                    <span className="suite-badge bg-white/90 backdrop-blur px-2 py-1 md:px-3 md:py-1.5 rounded-lg text-xs md:text-sm font-bold text-gray-900 shadow-md">Size: 20 m²</span>
                                 </div>
                                 <div className="absolute bottom-3 right-3 md:bottom-4 md:right-4 z-20">
-                                    <button onClick={() => setGalleryOpen(true)} className="flex items-center gap-1.5 md:gap-2 rounded-full bg-white/90 px-3 py-1.5 md:px-4 md:py-2 text-xs font-bold text-gray-900 shadow-md backdrop-blur hover:bg-white">
+                                    <button onClick={() => setGalleryOpen(true)} className="suite-gallery-btn flex items-center gap-1.5 md:gap-2 rounded-full bg-white/90 px-3 py-1.5 md:px-4 md:py-2 text-xs font-bold text-gray-900 shadow-md backdrop-blur hover:bg-white">
                                         <span className="material-symbols-outlined text-sm">photo_library</span>
                                         <span className="hidden xs:inline">View Gallery</span>
                                         <span className="xs:hidden">Gallery</span>
                                     </button>
                                 </div>
                             </div>
-                            <div className="w-full lg:w-1/2 flex flex-col gap-4 md:gap-6 lg:pl-8">
+                            <div className="suite-content w-full lg:w-1/2 flex flex-col gap-4 md:gap-6 lg:pl-8">
                                 <div className="w-full max-w-full">
                                     <div className="flex items-center gap-2 mb-2">
                                         <span className="material-symbols-outlined text-primary">bed</span>
@@ -555,7 +651,7 @@
                                         A cozy 20m² retreat with a comfortable Double Bed, perfect for couples or solo travelers. Includes tea/coffee facilities, en suite bathroom, and private entrance.
                                     </p>
                                 </div>
-                                <div className="w-full grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-y-2 md:gap-y-3 gap-x-2">
+                                <div className="amenities-grid w-full grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-y-2 md:gap-y-3 gap-x-2">
                                     {[
                                         { icon: "weekend", text: "Seating area" },
                                         { icon: "checkroom", text: "Clothes rack" },
@@ -584,23 +680,23 @@
                             </div>
                         </article>
 
-                        <article className="group mb-16 md:mb-24 flex flex-col gap-6 md:gap-12 lg:flex-row-reverse lg:items-start">
-                            <div className="relative w-full lg:w-1/2 max-w-full overflow-hidden rounded-2xl shadow-xl aspect-[4/3]">
+                        <article className="suite-article group mb-16 md:mb-24 flex flex-col gap-6 md:gap-12 lg:flex-row-reverse lg:items-start">
+                            <div className="suite-image-container relative w-full lg:w-1/2 max-w-full overflow-hidden rounded-2xl shadow-xl aspect-[4/3]">
                                 <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors duration-500 z-10"></div>
                                 <div className="h-full w-full bg-cover bg-center transition-transform duration-700 group-hover:scale-105" style={{ backgroundImage: 'url("uploaded_image_2_1767809265275.jpg")' }}>
                                 </div>
                                 <div className="absolute top-3 left-3 md:top-4 md:left-4 z-20">
-                                    <span className="bg-white/90 backdrop-blur px-2 py-1 md:px-3 md:py-1.5 rounded-lg text-xs md:text-sm font-bold text-gray-900 shadow-md">Size: 20 m²</span>
+                                    <span className="suite-badge bg-white/90 backdrop-blur px-2 py-1 md:px-3 md:py-1.5 rounded-lg text-xs md:text-sm font-bold text-gray-900 shadow-md">Size: 20 m²</span>
                                 </div>
                                 <div className="absolute bottom-3 right-3 md:bottom-4 md:right-4 z-20">
-                                    <button onClick={() => setGalleryOpen(true)} className="flex items-center gap-1.5 md:gap-2 rounded-full bg-white/90 px-3 py-1.5 md:px-4 md:py-2 text-xs font-bold text-gray-900 shadow-md backdrop-blur hover:bg-white">
+                                    <button onClick={() => setGalleryOpen(true)} className="suite-gallery-btn flex items-center gap-1.5 md:gap-2 rounded-full bg-white/90 px-3 py-1.5 md:px-4 md:py-2 text-xs font-bold text-gray-900 shadow-md backdrop-blur hover:bg-white">
                                         <span className="material-symbols-outlined text-sm">photo_library</span>
                                         <span className="hidden xs:inline">View Gallery</span>
                                         <span className="xs:hidden">Gallery</span>
                                     </button>
                                 </div>
                             </div>
-                            <div className="w-full lg:w-1/2 flex flex-col gap-4 md:gap-6 lg:pr-8">
+                            <div className="suite-content w-full lg:w-1/2 flex flex-col gap-4 md:gap-6 lg:pr-8">
                                 <div className="w-full max-w-full">
                                     <div className="flex items-center gap-2 mb-2">
                                         <div className="flex items-center gap-1">
@@ -614,7 +710,7 @@
                                         Spacious 20m² room with 2 Single Beds, ideal for friends or family traveling together. Includes tea/coffee facilities, en suite bathroom, and private entrance.
                                     </p>
                                 </div>
-                                <div className="w-full grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-y-2 md:gap-y-3 gap-x-2">
+                                <div className="amenities-grid w-full grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-y-2 md:gap-y-3 gap-x-2">
                                     {[
                                         { icon: "weekend", text: "Seating area" },
                                         { icon: "checkroom", text: "Clothes rack" },
