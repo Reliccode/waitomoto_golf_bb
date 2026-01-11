@@ -6,6 +6,9 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Waitomo Golfstays B&B</title>
 
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="favicon.png">
+
     <!-- Fonts -->
     <link
         href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Noto+Sans:wght@400;500;600;700&display=swap"
@@ -42,15 +45,25 @@
     <!-- React Dependencies -->
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/history@5/umd/history.development.js"></script>
-    <script src="https://unpkg.com/react-router@6.3.0/umd/react-router.development.js"></script>
-    <script src="https://unpkg.com/react-router-dom@6.3.0/umd/react-router-dom.development.js"></script>
     <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
 
     <style>
         /* Custom Styles */
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
             font-family: "Plus Jakarta Sans", sans-serif;
+            overflow-x: hidden;
+            width: 100%;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        /* Offset for anchor links due to sticky header */
+        [id] {
+            scroll-margin-top: 80px;
         }
 
         .material-symbols-outlined {
@@ -97,6 +110,50 @@
                 transform: translateY(0)
             }
         }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -200% 0;
+            }
+
+            100% {
+                background-position: 200% 0;
+            }
+        }
+
+        @keyframes pulse-ring {
+            0% {
+                transform: scale(0.8);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .animate-shimmer {
+            background: linear-gradient(90deg, transparent, rgba(183, 235, 143, 0.3), transparent);
+            background-size: 200% 100%;
+            animation: shimmer 2s linear infinite;
+        }
     </style>
 </head>
 
@@ -108,7 +165,127 @@
         // --- React Setup ---
         const { useState, useEffect } = React;
         const { createRoot } = ReactDOM;
-        const { MemoryRouter, Routes, Route, Link, useNavigate, useLocation } = ReactRouterDOM;
+
+        // Smooth scroll function for navigation
+        const scrollToSection = (sectionId) => {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        };
+
+        // Modal Component
+        const Modal = ({ isOpen, onClose, title, children }) => {
+            if (!isOpen) return null;
+            return (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" onClick={onClose}>
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+                    <div className="relative bg-white dark:bg-[#1a2e1a] rounded-2xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden" onClick={e => e.stopPropagation()}>
+                        <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-800">
+                            <h2 className="text-xl font-bold text-[#0d1b0d] dark:text-white">{title}</h2>
+                            <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors">
+                                <span className="material-symbols-outlined text-gray-500">close</span>
+                            </button>
+                        </div>
+                        <div className="p-6 overflow-y-auto max-h-[60vh] text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+                            {children}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // Privacy Policy Content
+        const PrivacyPolicyContent = () => (
+            <div className="space-y-6">
+                <p><strong>Effective Date:</strong> 1 January 2024</p>
+                <p>Waitomo Golfstays B&B ("we," "us," or "our") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our property or use our services.</p>
+
+                <h3 className="text-lg font-bold text-[#0d1b0d] dark:text-white mt-6">1. Information We Collect</h3>
+                <p>We may collect personal information that you voluntarily provide to us when you make a reservation, including:</p>
+                <ul className="list-disc pl-6 space-y-1">
+                    <li>Full name and contact details (email, phone number, postal address)</li>
+                    <li>Identification documents as required by New Zealand law</li>
+                    <li>Payment information (processed securely through third-party providers)</li>
+                    <li>Dietary requirements or special requests</li>
+                    <li>Vehicle registration details for parking purposes</li>
+                </ul>
+
+                <h3 className="text-lg font-bold text-[#0d1b0d] dark:text-white mt-6">2. Use of Your Information</h3>
+                <p>We use your personal information to:</p>
+                <ul className="list-disc pl-6 space-y-1">
+                    <li>Process and manage your accommodation booking</li>
+                    <li>Communicate with you regarding your reservation</li>
+                    <li>Comply with legal and regulatory requirements</li>
+                    <li>Improve our services and guest experience</li>
+                    <li>Send promotional materials (with your consent)</li>
+                </ul>
+
+                <h3 className="text-lg font-bold text-[#0d1b0d] dark:text-white mt-6">3. Data Retention</h3>
+                <p>We retain your personal information only for as long as necessary to fulfill the purposes outlined in this policy, unless a longer retention period is required by law.</p>
+
+                <h3 className="text-lg font-bold text-[#0d1b0d] dark:text-white mt-6">4. Third-Party Sharing</h3>
+                <p>We do not sell, trade, or rent your personal information to third parties. We may share your information with trusted service providers (e.g., payment processors, booking platforms) who assist in operating our business, subject to confidentiality agreements.</p>
+
+                <h3 className="text-lg font-bold text-[#0d1b0d] dark:text-white mt-6">5. Your Rights</h3>
+                <p>Under the New Zealand Privacy Act 2020, you have the right to access, correct, or request deletion of your personal information. To exercise these rights, please contact us at stay@waitomogolfstays.co.nz.</p>
+
+                <h3 className="text-lg font-bold text-[#0d1b0d] dark:text-white mt-6">6. Contact Us</h3>
+                <p>If you have questions about this Privacy Policy, please contact us at:<br />
+                    Email: reservations@waitomogolfstays.co.nz<br />
+                    Phone: +64 7 873 9190<br />
+                    Address: 54 Golf Road, Otorohanga 3977, New Zealand</p>
+            </div>
+        );
+
+        // Terms of Service Content
+        const TermsOfServiceContent = () => (
+            <div className="space-y-6">
+                <p><strong>Effective Date:</strong> 1 January 2024</p>
+                <p>By making a reservation at Waitomo Golfstays B&B, you agree to the following terms and conditions. Please read them carefully before booking.</p>
+
+                <h3 className="text-lg font-bold text-[#0d1b0d] dark:text-white mt-6">1. Booking & Payment</h3>
+                <ul className="list-disc pl-6 space-y-1">
+                    <li>A valid credit card is required to secure your reservation.</li>
+                    <li>Full payment may be required at the time of booking or upon check-in, depending on the rate selected.</li>
+                    <li>All rates are quoted in New Zealand Dollars (NZD) and are inclusive of GST.</li>
+                </ul>
+
+                <h3 className="text-lg font-bold text-[#0d1b0d] dark:text-white mt-6">2. Check-in & Check-out</h3>
+                <ul className="list-disc pl-6 space-y-1">
+                    <li>Check-in: 2:00 PM – 7:00 PM (14:00 – 19:00)</li>
+                    <li>Check-out: 7:00 AM – 10:00 AM (07:00 – 10:00)</li>
+                    <li>Early check-in or late check-out may be arranged subject to availability.</li>
+                </ul>
+
+                <h3 className="text-lg font-bold text-[#0d1b0d] dark:text-white mt-6">3. Cancellation Policy</h3>
+                <ul className="list-disc pl-6 space-y-1">
+                    <li>Free cancellation up to 5 days before arrival.</li>
+                    <li>Cancellations within 5 days of check-in: The first night's rate will be charged.</li>
+                    <li>No-shows: Full booking amount will be charged.</li>
+                </ul>
+
+                <h3 className="text-lg font-bold text-[#0d1b0d] dark:text-white mt-6">4. Guest Conduct</h3>
+                <ul className="list-disc pl-6 space-y-1">
+                    <li>This is an adults-only property (18+). Children and infants are not permitted.</li>
+                    <li>Smoking is strictly prohibited in all indoor areas.</li>
+                    <li>Pets are not permitted on the property.</li>
+                    <li>Quiet hours are observed between 10:00 PM and 7:00 AM.</li>
+                    <li>Guests are responsible for any damage caused to the property during their stay.</li>
+                </ul>
+
+                <h3 className="text-lg font-bold text-[#0d1b0d] dark:text-white mt-6">5. Liability</h3>
+                <p>Waitomo Golfstays B&B is not liable for loss, theft, or damage to guest belongings. Guests are advised to use the in-room safe for valuables. We are not responsible for injuries resulting from misuse of facilities or failure to follow safety guidelines.</p>
+
+                <h3 className="text-lg font-bold text-[#0d1b0d] dark:text-white mt-6">6. Governing Law</h3>
+                <p>These terms and conditions are governed by the laws of New Zealand. Any disputes shall be subject to the exclusive jurisdiction of New Zealand courts.</p>
+
+                <h3 className="text-lg font-bold text-[#0d1b0d] dark:text-white mt-6">7. Contact</h3>
+                <p>For questions regarding these terms, please contact:<br />
+                    Email: stay@waitomogolfstays.co.nz<br />
+                    Phone: +64 7 123 4567</p>
+            </div>
+        );
 
         // --- Common Components ---
 
@@ -116,19 +293,19 @@
             <div className="bg-[#0d1b0d] text-gray-300 dark:bg-[#081108] border-b border-white/5 dark:border-white/5 relative z-[60] hidden md:block">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="flex flex-col sm:flex-row justify-between items-center py-2 gap-2 text-xs font-medium tracking-wide">
-                        <div className="flex items-center gap-2 opacity-90 hidden sm:flex">
+                        <a href="https://www.google.com/maps/search/?api=1&query=54+Golf+Road+Otorohanga+3977+New+Zealand" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 opacity-90 hidden sm:flex hover:text-primary transition-colors">
                             <span className="material-symbols-outlined text-[16px] text-primary">location_on</span>
-                            <span>123 Golf Road, Otorohanga, New Zealand</span>
-                        </div>
+                            <span>54 Golf Road, Otorohanga, New Zealand</span>
+                        </a>
                         <div className="flex items-center gap-4 sm:gap-6 w-full sm:w-auto justify-center sm:justify-end">
-                            <a className="flex items-center gap-1.5 hover:text-primary transition-colors duration-200 group" href="#">
+                            <a className="flex items-center gap-1.5 hover:text-primary transition-colors duration-200 group" href="tel:+6478739190">
                                 <span className="material-symbols-outlined text-[16px] text-primary group-hover:scale-110 transition-transform">call</span>
-                                <span>+64 7 123 4567</span>
+                                <span>+64 7 873 9190</span>
                             </a>
                             <span className="text-white/20 hidden sm:inline">|</span>
-                            <a className="flex items-center gap-1.5 hover:text-primary transition-colors duration-200 group" href="#">
+                            <a className="flex items-center gap-1.5 hover:text-primary transition-colors duration-200 group" href="mailto:reservations@waitomogolfstays.co.nz">
                                 <span className="material-symbols-outlined text-[16px] text-primary group-hover:scale-110 transition-transform">mail</span>
-                                <span>stay@waitomogolfstays.co.nz</span>
+                                <span>reservations@waitomogolfstays.co.nz</span>
                             </a>
                         </div>
                     </div>
@@ -138,35 +315,36 @@
 
         const Header = () => {
             const [isMenuOpen, setIsMenuOpen] = useState(false);
-            const location = useLocation();
 
-            const getLinkClass = (path) => {
-                const isActive = location.pathname === path;
-                return `text-sm font-medium transition-colors ${isActive ? 'text-primary font-bold' : 'text-[#0d1b0d] dark:text-gray-200 hover:text-primary'}`;
+            const navLinkClass = "text-sm font-medium transition-colors text-[#0d1b0d] dark:text-gray-200 hover:text-primary cursor-pointer";
+
+            const handleNavClick = (sectionId) => {
+                scrollToSection(sectionId);
+                setIsMenuOpen(false);
             };
 
             return (
                 <header className="sticky top-0 z-50 w-full border-b border-[#e7f3e7] dark:border-gray-800 bg-[#f8fcf8]/80 dark:bg-[#102210]/80 backdrop-blur-md">
                     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                         <div className="flex h-16 items-center justify-between">
-                            <Link to="/" className="flex items-center gap-4">
+                            <a href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="flex items-center gap-4">
                                 <div className="size-8 text-primary">
                                     <span className="material-symbols-outlined text-3xl">golf_course</span>
                                 </div>
                                 <h2 className="text-lg font-bold leading-tight tracking-[-0.015em] text-[#0d1b0d] dark:text-white hidden sm:block">Waitomo Golfstays B&B</h2>
-                            </Link>
+                            </a>
 
                             {/* Desktop Nav */}
                             <div className="flex flex-1 justify-end gap-8 items-center">
                                 <nav className="hidden md:flex items-center gap-9">
-                                    <Link className={getLinkClass("/")} to="/">Suites</Link>
-                                    <Link className={getLinkClass("/attractions")} to="/attractions">Attractions</Link>
-                                    <Link className={getLinkClass("/contact")} to="/contact">Contact</Link>
-                                    <Link className={getLinkClass("/booking")} to="/booking">Info</Link>
+                                    <a className={navLinkClass} onClick={() => handleNavClick('rooms')}>Suites</a>
+                                    <a className={navLinkClass} onClick={() => handleNavClick('attractions')}>Attractions</a>
+                                    <a className={navLinkClass} onClick={() => handleNavClick('contact')}>Contact</a>
+                                    <a className={navLinkClass} onClick={() => handleNavClick('info')}>Info</a>
                                 </nav>
-                                <Link to="/booking" className="hidden md:flex cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-6 bg-primary text-[#0d1b0d] text-sm font-bold shadow-lg hover:bg-primary/90 transition-all transform hover:scale-[1.02]">
+                                <a onClick={() => handleNavClick('info')} className="hidden md:flex cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-6 bg-primary text-[#0d1b0d] text-sm font-bold shadow-lg hover:bg-primary/90 transition-all transform hover:scale-[1.02]">
                                     <span className="truncate">Book Now</span>
-                                </Link>
+                                </a>
 
                                 {/* Mobile Menu Button */}
                                 <button
@@ -183,13 +361,13 @@
                     {isMenuOpen && (
                         <div className="md:hidden border-t border-[#e7f3e7] dark:border-gray-800 bg-[#f8fcf8] dark:bg-[#102210] p-4">
                             <nav className="flex flex-col gap-4">
-                                <Link className={getLinkClass("/")} to="/" onClick={() => setIsMenuOpen(false)}>Suites</Link>
-                                <Link className={getLinkClass("/attractions")} to="/attractions" onClick={() => setIsMenuOpen(false)}>Attractions</Link>
-                                <Link className={getLinkClass("/contact")} to="/contact" onClick={() => setIsMenuOpen(false)}>Contact</Link>
-                                <Link className={getLinkClass("/booking")} to="/booking" onClick={() => setIsMenuOpen(false)}>Info</Link>
-                                <Link to="/booking" onClick={() => setIsMenuOpen(false)} className="w-full flex items-center justify-center rounded-lg h-12 bg-primary text-[#0d1b0d] font-bold">
+                                <a className={navLinkClass} onClick={() => handleNavClick('rooms')}>Suites</a>
+                                <a className={navLinkClass} onClick={() => handleNavClick('attractions')}>Attractions</a>
+                                <a className={navLinkClass} onClick={() => handleNavClick('contact')}>Contact</a>
+                                <a className={navLinkClass} onClick={() => handleNavClick('info')}>Info</a>
+                                <a onClick={() => handleNavClick('info')} className="w-full flex items-center justify-center rounded-lg h-12 bg-primary text-[#0d1b0d] font-bold cursor-pointer">
                                     Book Now
-                                </Link>
+                                </a>
                             </nav>
                         </div>
                     )}
@@ -197,7 +375,7 @@
             );
         };
 
-        const Footer = () => (
+        const Footer = ({ onOpenPrivacy, onOpenTerms }) => (
             <footer className="bg-white dark:bg-[#152515] border-t border-[#e7f3e7] dark:border-gray-800 py-12 mt-auto">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="flex flex-col md:flex-row justify-between items-center gap-6">
@@ -206,32 +384,101 @@
                                 <span className="material-symbols-outlined text-primary">golf_course</span>
                                 <span className="font-bold text-lg text-[#0d1b0d] dark:text-white">Waitomo Golfstays B&B</span>
                             </div>
-                            <p className="text-sm text-gray-500 text-center md:text-left">
-                                123 Golf Road, Otorohanga 3900, New Zealand<br />
-                                Phone: +64 7 123 4567 | Email: stay@waitomogolfstays.co.nz
-                            </p>
+                            <div className="text-sm text-gray-500 text-center md:text-left flex flex-col gap-1">
+                                <a href="https://www.google.com/maps/search/?api=1&query=54+Golf+Road+Otorohanga+3977+New+Zealand" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">54 Golf Road, Otorohanga 3977, New Zealand</a>
+                                <div className="flex flex-col md:flex-row md:gap-1">
+                                    <span>Phone: <a href="tel:+6478739190" className="hover:text-primary transition-colors">+64 7 873 9190</a></span>
+                                    <span className="hidden md:inline">|</span>
+                                    <span>Email: <a href="mailto:reservations@waitomogolfstays.co.nz" className="hover:text-primary transition-colors break-all md:break-normal">reservations@waitomogolfstays.co.nz</a></span>
+                                </div>
+                            </div>
                         </div>
                         <div className="flex gap-6">
-                            <Link className="text-gray-500 hover:text-primary transition-colors text-sm font-medium" to="/">Privacy Policy</Link>
-                            <Link className="text-gray-500 hover:text-primary transition-colors text-sm font-medium" to="/">Terms of Service</Link>
+                            <a className="text-gray-500 hover:text-primary transition-colors text-sm font-medium cursor-pointer" onClick={onOpenPrivacy}>Privacy Policy</a>
+                            <a className="text-gray-500 hover:text-primary transition-colors text-sm font-medium cursor-pointer" onClick={onOpenTerms}>Terms of Service</a>
                         </div>
                     </div>
                     <div className="mt-8 text-center text-xs text-gray-400">
-                        © 2024 Waitomo Golfstays B&B. All rights reserved.
+                        © {new Date().getFullYear()} Waitomo Golfstays B&B. All rights reserved.
                     </div>
                 </div>
             </footer>
         );
 
+        // --- Gallery Modal ---
+        const GalleryModal = ({ isOpen, onClose }) => {
+            const [currentIndex, setCurrentIndex] = useState(0);
+            const images = [
+                { src: 'double-room.jpg', alt: 'Double Room' },
+                { src: 'gallery-1.jpg', alt: 'Garden View' },
+                { src: 'gallery-2.jpg', alt: 'Property Aerial View' },
+                { src: 'gallery-3.jpg', alt: 'Property Front View' },
+                { src: 'gallery-4.jpg', alt: 'Outdoor Dining Area' },
+            ];
+
+            const nextImage = () => setCurrentIndex((prev) => (prev + 1) % images.length);
+            const prevImage = () => setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
+
+            if (!isOpen) return null;
+
+            return (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90" onClick={onClose}>
+                    <div className="relative max-w-4xl w-full mx-4" onClick={(e) => e.stopPropagation()}>
+                        {/* Close button */}
+                        <button onClick={onClose} className="absolute -top-12 right-0 text-white hover:text-primary transition-colors">
+                            <span className="material-symbols-outlined text-3xl">close</span>
+                        </button>
+
+                        {/* Main image */}
+                        <div className="relative aspect-video bg-black rounded-lg overflow-hidden">
+                            <img
+                                src={images[currentIndex].src}
+                                alt={images[currentIndex].alt}
+                                className="w-full h-full object-contain"
+                                loading="lazy"
+                            />
+                        </div>
+
+                        {/* Navigation arrows */}
+                        <button onClick={prevImage} className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 hover:bg-white/40 text-white flex items-center justify-center transition-colors">
+                            <span className="material-symbols-outlined">chevron_left</span>
+                        </button>
+                        <button onClick={nextImage} className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 hover:bg-white/40 text-white flex items-center justify-center transition-colors">
+                            <span className="material-symbols-outlined">chevron_right</span>
+                        </button>
+
+                        {/* Image counter */}
+                        <div className="text-center text-white mt-4 text-sm">
+                            {currentIndex + 1} / {images.length} — {images[currentIndex].alt}
+                        </div>
+
+                        {/* Thumbnail strip */}
+                        <div className="flex justify-center gap-2 mt-4">
+                            {images.map((img, idx) => (
+                                <button
+                                    key={idx}
+                                    onClick={() => setCurrentIndex(idx)}
+                                    className={`w-16 h-12 rounded overflow-hidden border-2 transition-all ${idx === currentIndex ? 'border-primary' : 'border-transparent opacity-60 hover:opacity-100'}`}
+                                >
+                                    <img src={img.src} alt={img.alt} className="w-full h-full object-cover" loading="lazy" />
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
         // --- Screens ---
 
         const HomePage = () => {
-            const navigate = useNavigate();
+            const [galleryOpen, setGalleryOpen] = useState(false);
+
             return (
-                <div className="flex flex-col min-h-screen">
+                <div id="suites" className="flex flex-col">
                     <section className="relative flex min-h-[55vh] flex-col items-center justify-between overflow-hidden bg-cover bg-center bg-no-repeat px-4 py-8 text-center" style={{ backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.1) 40%, rgba(0, 0, 0, 0.1) 60%, rgba(0, 0, 0, 0.4) 100%), url("hero-entrance.jpg")' }}>
                         {/* Top Content */}
-                        <div className="max-w-4xl space-y-4 animate-fade-in-up">
+                        <div className="max-w-4xl space-y-4 animate-fade-in-up mt-24">
                             <span className="inline-block rounded-full bg-primary/20 backdrop-blur-sm px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-white border border-primary/40">
                                 Adult-Only Sanctuary
                             </span>
@@ -241,52 +488,74 @@
                         </div>
 
                         {/* Bottom Content */}
-                        <div className="max-w-2xl animate-fade-in-up">
+                        <div className="max-w-2xl animate-fade-in-up mb-8">
                             <p className="text-lg text-gray-100 sm:text-xl">
                                 An elegant escape designed for comfort and peace. Unwind in our premium suites overlooking the greens.
                             </p>
                         </div>
                     </section>
+
+                    {/* Why Stay With Us Section */}
+                    <section className="py-16 bg-white dark:bg-[#152915]">
+                        <div className="container mx-auto px-4 max-w-6xl">
+                            <div className="text-center mb-12">
+                                <h3 className="text-primary font-bold uppercase tracking-wider text-sm mb-2">Why Stay With Us?</h3>
+                                <h2 className="text-3xl md:text-4xl font-bold text-[#0d1b0d] dark:text-white">A Premium Experience</h2>
+                            </div>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+                                {[
+                                    { icon: "person_off", title: "Adults Only", desc: "Strictly 18+ environment for peace and tranquility" },
+                                    { icon: "golf_course", title: "Golf Access", desc: "Direct access to the adjacent golf course" },
+                                    { icon: "wifi", title: "Free Wifi", desc: "High-speed complimentary internet connection" },
+                                    { icon: "bakery_dining", title: "Breakfast", desc: "Delicious breakfast included daily" }
+                                ].map((item, idx) => (
+                                    <div key={idx} className="text-center p-4">
+                                        <div className="bg-primary/10 p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                                            <span className="material-symbols-outlined text-primary text-2xl">{item.icon}</span>
+                                        </div>
+                                        <h4 className="font-bold text-[#0d1b0d] dark:text-white mb-2">{item.title}</h4>
+                                        <p className="text-sm text-gray-600 dark:text-gray-400">{item.desc}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+
                     <main className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-                        <div className="mb-20 text-center max-w-3xl mx-auto">
+                        <div id="rooms" className="mb-20 text-center max-w-3xl mx-auto">
                             <h2 className="text-3xl font-bold tracking-tight mb-4 text-[#0d1b0d] dark:text-white">Our Exclusive Suites</h2>
                             <p className="text-gray-600 dark:text-gray-400">
-                                Each of our boutique units is thoughtfully appointed with modern amenities to ensure your stay is as relaxing as possible. Enjoy private entrances, premium linens, and serene views.
+                                Each of our units is thoughtfully appointed with modern amenities to ensure your stay is as relaxing as possible. Enjoy private entrances, premium linens, and serene views.
                             </p>
                         </div>
-                        <article className="group mb-24 flex flex-col gap-12 lg:flex-row lg:items-center">
-                            <div className="relative w-full lg:w-1/2 overflow-hidden rounded-2xl shadow-xl aspect-[4/3]">
+                        <article className="group mb-16 md:mb-24 flex flex-col gap-6 md:gap-12 lg:flex-row lg:items-start">
+                            <div className="relative w-full lg:w-1/2 max-w-full overflow-hidden rounded-2xl shadow-xl aspect-[4/3]">
                                 <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors duration-500 z-10"></div>
-                                <div className="h-full w-full bg-cover bg-center transition-transform duration-700 group-hover:scale-105" style={{ backgroundImage: 'url("uploaded_image_3_1767809265275.jpg")' }}>
+                                <div className="h-full w-full bg-cover bg-center transition-transform duration-700 group-hover:scale-105" style={{ backgroundImage: 'url("double-room.jpg")' }}>
                                 </div>
-                                <div className="absolute top-4 left-4 z-20">
-                                    <span className="bg-white/90 backdrop-blur px-3 py-1.5 rounded-lg text-sm font-bold text-gray-900 shadow-md">Size: 20 m²</span>
+                                <div className="absolute top-3 left-3 md:top-4 md:left-4 z-20">
+                                    <span className="bg-white/90 backdrop-blur px-2 py-1 md:px-3 md:py-1.5 rounded-lg text-xs md:text-sm font-bold text-gray-900 shadow-md">Size: 20 m²</span>
                                 </div>
-                                <div className="absolute bottom-4 right-4 z-20">
-                                    <button className="flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-xs font-bold text-gray-900 shadow-md backdrop-blur hover:bg-white">
+                                <div className="absolute bottom-3 right-3 md:bottom-4 md:right-4 z-20">
+                                    <button onClick={() => setGalleryOpen(true)} className="flex items-center gap-1.5 md:gap-2 rounded-full bg-white/90 px-3 py-1.5 md:px-4 md:py-2 text-xs font-bold text-gray-900 shadow-md backdrop-blur hover:bg-white">
                                         <span className="material-symbols-outlined text-sm">photo_library</span>
-                                        View Gallery
+                                        <span className="hidden xs:inline">View Gallery</span>
+                                        <span className="xs:hidden">Gallery</span>
                                     </button>
                                 </div>
                             </div>
-                            <div className="flex flex-col gap-6 lg:w-1/2 lg:pl-8">
-                                <div>
-                                    <div className="flex items-center justify-between mb-2">
-                                        <div className="flex items-center gap-2">
-                                            <span className="material-symbols-outlined text-primary">bed</span>
-                                            <span className="text-sm text-gray-600 dark:text-gray-400">1 Double bed</span>
-                                        </div>
-                                        <button className="text-primary font-bold text-sm hover:underline flex items-center gap-1">
-                                            Check Prices
-                                            <span className="material-symbols-outlined text-sm">arrow_forward</span>
-                                        </button>
+                            <div className="w-full lg:w-1/2 flex flex-col gap-4 md:gap-6 lg:pl-8">
+                                <div className="w-full max-w-full">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <span className="material-symbols-outlined text-primary">bed</span>
+                                        <span className="text-sm text-gray-600 dark:text-gray-400">1 Double bed</span>
                                     </div>
-                                    <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Double Room</h3>
-                                    <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-6">
-                                        This room includes tea/coffee making facilities, TV and an en suite bathroom. Enjoy a comfortable stay in our well-appointed double room with private entrance and soundproofed windows.
+                                    <h3 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3 md:mb-4">Double Room</h3>
+                                    <p className="text-sm md:text-base text-gray-600 dark:text-gray-300 leading-relaxed mb-4 md:mb-6 max-w-full">
+                                        A cozy 20m² retreat with a comfortable Double Bed, perfect for couples or solo travelers. Includes tea/coffee facilities, en suite bathroom, and private entrance.
                                     </p>
                                 </div>
-                                <div className="grid grid-cols-2 md:grid-cols-3 gap-y-3 gap-x-2">
+                                <div className="w-full grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-y-2 md:gap-y-3 gap-x-2">
                                     {[
                                         { icon: "weekend", text: "Seating area" },
                                         { icon: "checkroom", text: "Clothes rack" },
@@ -301,56 +570,51 @@
                                         { icon: "kitchen", text: "Refrigerator" },
                                         { icon: "tv", text: "Flat-screen TV" }
                                     ].map((item, idx) => (
-                                        <div key={idx} className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200">
-                                            <span className="material-symbols-outlined text-primary text-lg">{item.icon}</span>
-                                            {item.text}
+                                        <div key={idx} className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm text-gray-700 dark:text-gray-200">
+                                            <span className="material-symbols-outlined text-primary text-base md:text-lg flex-shrink-0">{item.icon}</span>
+                                            <span className="truncate">{item.text}</span>
                                         </div>
                                     ))}
                                 </div>
-                                <div className="pt-6 border-t border-gray-100 dark:border-gray-800 flex gap-4">
-                                    <button onClick={() => navigate('/booking')} className="flex-1 bg-primary hover:bg-primary/90 text-[#0d1b0d] font-bold py-3 px-6 rounded-lg transition-colors shadow-sm">
+                                <div className="pt-4 md:pt-6 border-t border-gray-100 dark:border-gray-800">
+                                    <button onClick={() => scrollToSection('info')} className="w-full bg-primary hover:bg-primary/90 text-[#0d1b0d] font-bold py-3 px-6 rounded-lg transition-colors shadow-sm">
                                         Book Double Room
-                                    </button>
-                                    <button className="flex items-center justify-center px-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                                        <span className="material-symbols-outlined text-gray-600 dark:text-gray-300">favorite</span>
                                     </button>
                                 </div>
                             </div>
                         </article>
 
-                        <article className="group mb-24 flex flex-col gap-12 lg:flex-row-reverse lg:items-center">
-                            <div className="relative w-full lg:w-1/2 overflow-hidden rounded-2xl shadow-xl aspect-[4/3]">
+                        <article className="group mb-16 md:mb-24 flex flex-col gap-6 md:gap-12 lg:flex-row-reverse lg:items-start">
+                            <div className="relative w-full lg:w-1/2 max-w-full overflow-hidden rounded-2xl shadow-xl aspect-[4/3]">
                                 <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors duration-500 z-10"></div>
                                 <div className="h-full w-full bg-cover bg-center transition-transform duration-700 group-hover:scale-105" style={{ backgroundImage: 'url("uploaded_image_2_1767809265275.jpg")' }}>
                                 </div>
-                                <div className="absolute top-4 left-4 z-20">
-                                    <span className="bg-white/90 backdrop-blur px-3 py-1.5 rounded-lg text-sm font-bold text-gray-900 shadow-md">Size: 20 m²</span>
+                                <div className="absolute top-3 left-3 md:top-4 md:left-4 z-20">
+                                    <span className="bg-white/90 backdrop-blur px-2 py-1 md:px-3 md:py-1.5 rounded-lg text-xs md:text-sm font-bold text-gray-900 shadow-md">Size: 20 m²</span>
                                 </div>
-                                <div className="absolute bottom-4 right-4 z-20">
-                                    <button className="flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-xs font-bold text-gray-900 shadow-md backdrop-blur hover:bg-white">
+                                <div className="absolute bottom-3 right-3 md:bottom-4 md:right-4 z-20">
+                                    <button onClick={() => setGalleryOpen(true)} className="flex items-center gap-1.5 md:gap-2 rounded-full bg-white/90 px-3 py-1.5 md:px-4 md:py-2 text-xs font-bold text-gray-900 shadow-md backdrop-blur hover:bg-white">
                                         <span className="material-symbols-outlined text-sm">photo_library</span>
-                                        View Gallery
+                                        <span className="hidden xs:inline">View Gallery</span>
+                                        <span className="xs:hidden">Gallery</span>
                                     </button>
                                 </div>
                             </div>
-                            <div className="flex flex-col gap-6 lg:w-1/2 lg:pr-8">
-                                <div>
-                                    <div className="flex items-center justify-between mb-2">
-                                        <div className="flex items-center gap-2">
-                                            <span className="material-symbols-outlined text-primary">bed</span>
-                                            <span className="text-sm text-gray-600 dark:text-gray-400">2 Single beds</span>
+                            <div className="w-full lg:w-1/2 flex flex-col gap-4 md:gap-6 lg:pr-8">
+                                <div className="w-full max-w-full">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <div className="flex items-center gap-1">
+                                            <span className="material-symbols-outlined text-primary text-lg">single_bed</span>
+                                            <span className="material-symbols-outlined text-primary text-lg">single_bed</span>
                                         </div>
-                                        <button className="text-primary font-bold text-sm hover:underline flex items-center gap-1">
-                                            Check Prices
-                                            <span className="material-symbols-outlined text-sm">arrow_forward</span>
-                                        </button>
+                                        <span className="text-sm text-gray-600 dark:text-gray-400">2 Single beds</span>
                                     </div>
-                                    <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Twin Room</h3>
-                                    <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-6">
-                                        This room includes tea/coffee making facilities, TV and an en suite bathroom. Please note that the price is based on 1 or 2 guests. Maximum occupancy is 3 (see Hotel Policies).
+                                    <h3 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3 md:mb-4">Twin Room</h3>
+                                    <p className="text-sm md:text-base text-gray-600 dark:text-gray-300 leading-relaxed mb-4 md:mb-6 max-w-full">
+                                        Spacious 20m² room with 2 Single Beds, ideal for friends or family traveling together. Includes tea/coffee facilities, en suite bathroom, and private entrance.
                                     </p>
                                 </div>
-                                <div className="grid grid-cols-2 md:grid-cols-3 gap-y-3 gap-x-2">
+                                <div className="w-full grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-y-2 md:gap-y-3 gap-x-2">
                                     {[
                                         { icon: "weekend", text: "Seating area" },
                                         { icon: "checkroom", text: "Clothes rack" },
@@ -365,39 +629,108 @@
                                         { icon: "kitchen", text: "Refrigerator" },
                                         { icon: "tv", text: "Flat-screen TV" }
                                     ].map((item, idx) => (
-                                        <div key={idx} className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200">
-                                            <span className="material-symbols-outlined text-primary text-lg">{item.icon}</span>
-                                            {item.text}
+                                        <div key={idx} className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm text-gray-700 dark:text-gray-200">
+                                            <span className="material-symbols-outlined text-primary text-base md:text-lg flex-shrink-0">{item.icon}</span>
+                                            <span className="truncate">{item.text}</span>
                                         </div>
                                     ))}
                                 </div>
-                                <div className="pt-6 border-t border-gray-100 dark:border-gray-800 flex gap-4">
-                                    <button onClick={() => navigate('/booking')} className="flex-1 bg-primary hover:bg-primary/90 text-[#0d1b0d] font-bold py-3 px-6 rounded-lg transition-colors shadow-sm">
+                                <div className="pt-4 md:pt-6 border-t border-gray-100 dark:border-gray-800">
+                                    <button onClick={() => scrollToSection('info')} className="w-full bg-primary hover:bg-primary/90 text-[#0d1b0d] font-bold py-3 px-6 rounded-lg transition-colors shadow-sm">
                                         Book Twin Room
-                                    </button>
-                                    <button className="flex items-center justify-center px-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                                        <span className="material-symbols-outlined text-gray-600 dark:text-gray-300">favorite</span>
                                     </button>
                                 </div>
                             </div>
                         </article>
 
-                        <section className="my-20 relative rounded-3xl overflow-hidden bg-[#eafce9] dark:bg-[#152e15] px-6 py-16 text-center">
-                            <span className="material-symbols-outlined text-6xl text-primary/30 absolute top-4 left-6 rotate-180">format_quote</span>
-                            <div className="max-w-3xl mx-auto relative z-10">
-                                <h3 className="text-2xl font-semibold italic text-[#0d1b0d] dark:text-gray-100 mb-6">
-                                    "An absolute gem in Otorohanga. The peace and quiet was exactly what we needed. The room was spotless and the bed was incredibly comfortable."
-                                </h3>
-                                <div className="flex items-center justify-center gap-3">
-                                    <div className="size-10 rounded-full bg-gray-300 bg-cover bg-center" style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuAEFmATXn6m7bXvT9eZJoMqVlbGVVCPNXTP073SqYQmLJvyYi7Q1iBkXwOUiojKhIcl17mOV5Nb5CtSuT05Alcir0i2ZK9kCRXRqdRtvfDmOFBuyrSjkLP9NAwoZG0noRn-gmUH3uns-GSMG3Qkp3ClFKnOihognglO7_WFg4ZF3nJYEDooqsnnyN4eL036m_kqyM_DPK2mPLx9PRzvgU_2Bbz1rift5WQ0Pv8qOfdaF7IkRnkDpa-eyopegkiGEFI9Tgc1qj23")' }}></div>
-                                    <div className="text-left">
-                                        <p className="text-sm font-bold text-[#0d1b0d] dark:text-white">Sarah Jenkins</p>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400">Stayed in October 2023</p>
+                        {/* Auto-Sliding Testimonials Carousel */}
+                        {(() => {
+                            const [currentReview, setCurrentReview] = React.useState(0);
+                            const reviews = [
+                                {
+                                    quote: "Lovely peaceful location with an excellent continental breakfast. The hosts are very friendly and helpful, we appreciated being able to borrow beach towels for black water rafting. Thanks for hosting us!",
+                                    name: "Alice",
+                                    date: "December 2025 · United Kingdom",
+                                    image: ""
+                                },
+                                {
+                                    quote: "The room was very tidy, the place was great. The view was beautiful. People are very easy to deal with.",
+                                    name: "Noel",
+                                    date: "November 2025 · New Zealand",
+                                    image: ""
+                                },
+                                {
+                                    quote: "Very nice location and nearby to the town and restaurants. Clean and simple, very serene location.",
+                                    name: "Subhash",
+                                    date: "December 2025 · United States",
+                                    image: ""
+                                },
+                                {
+                                    quote: "Wonderful location, would stay again. Quiet location overlooking beautiful well-maintained garden. Away from highway, no road noise.",
+                                    name: "Aart",
+                                    date: "November 2025",
+                                    image: ""
+                                },
+                                {
+                                    quote: "Great location 10min outside the village to get some food. Breakfast is in the room ready for you! Cool idea. Amazing garden to eat or just chill.",
+                                    name: "Jonas",
+                                    date: "January 2026 · Switzerland",
+                                    image: ""
+                                }
+                            ];
+
+                            React.useEffect(() => {
+                                const timer = setInterval(() => {
+                                    setCurrentReview((prev) => (prev + 1) % reviews.length);
+                                }, 5000);
+                                return () => clearInterval(timer);
+                            }, []);
+
+                            return (
+                                <section className="my-20 relative rounded-3xl overflow-hidden bg-[#eafce9] dark:bg-[#152e15] px-4 md:px-6 py-12 md:py-16">
+                                    <span className="material-symbols-outlined text-4xl md:text-6xl text-primary/30 absolute top-4 left-4 md:left-6 rotate-180">format_quote</span>
+
+                                    <div className="max-w-3xl mx-auto relative z-10 overflow-hidden">
+                                        <div
+                                            className="flex w-full transition-transform duration-700 ease-in-out"
+                                            style={{ transform: `translateX(-${currentReview * 100}%)` }}
+                                        >
+                                            {reviews.map((review, idx) => (
+                                                <div key={idx} className="w-full min-w-full flex-shrink-0 text-center px-4">
+                                                    <h3 className="text-xl md:text-2xl font-semibold italic text-[#0d1b0d] dark:text-gray-100 mb-6 whitespace-normal break-words max-w-[90%] mx-auto">
+                                                        "{review.quote}"
+                                                    </h3>
+                                                    <div className="flex items-center justify-center gap-3">
+                                                        <div className="size-10 rounded-full bg-gray-300 bg-cover bg-center" style={{ backgroundImage: `url("${review.image}")` }}></div>
+                                                        <div className="text-left">
+                                                            <p className="text-sm font-bold text-[#0d1b0d] dark:text-white">{review.name}</p>
+                                                            <p className="text-xs text-gray-500 dark:text-gray-400">{review.date}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        {/* Dot Navigation */}
+                                        <div className="flex justify-center gap-2 mt-8">
+                                            {reviews.map((_, idx) => (
+                                                <button
+                                                    key={idx}
+                                                    onClick={() => setCurrentReview(idx)}
+                                                    className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${idx === currentReview
+                                                        ? 'bg-primary w-8'
+                                                        : 'bg-gray-300 dark:bg-gray-600 hover:bg-primary/50'
+                                                        }`}
+                                                    aria-label={`Go to review ${idx + 1}`}
+                                                />
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
-                            <span className="material-symbols-outlined text-6xl text-primary/30 absolute bottom-4 right-6">format_quote</span>
-                        </section>
+
+                                    <span className="material-symbols-outlined text-6xl text-primary/30 absolute bottom-4 right-6">format_quote</span>
+                                </section>
+                            );
+                        })()}
 
                         <div className="mt-16">
                             <h3 className="text-2xl font-bold mb-8 text-center text-[#0d1b0d] dark:text-white">Property Amenities</h3>
@@ -419,111 +752,132 @@
                             </div>
                         </div>
                     </main>
+
+                    {/* Gallery Modal */}
+                    <GalleryModal isOpen={galleryOpen} onClose={() => setGalleryOpen(false)} />
                 </div>
             );
         };
 
         const AttractionsPage = () => {
+            const attractions = [
+                {
+                    title: "Waitomo Big Bird & Petting Farm",
+                    distance: "7.2 km",
+                    description: "A family-friendly attraction featuring ostriches, emus, and a variety of miniature animals to pet and feed.",
+                    image: "https://images.unsplash.com/photo-1500595046743-cd271d694e30?w=800",
+                    buttonText: "Get Directions",
+                    buttonIcon: "directions",
+                    link: "https://www.google.com/maps/search/?api=1&query=Waitomo+Big+Bird+Petting+Farm+New+Zealand"
+                },
+                {
+                    title: "Waitomo Glowworm Caves",
+                    distance: "7.5 km",
+                    description: "Marvel at thousands of magical glowworms as you glide silently by boat through the famous Glowworm Grotto.",
+                    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuC4JRq4c_B9neShV4vWDgA-q-034VjqK0w_M5Sn2QF6-oqKLHLCj0Zo9p-dsfugv6Z4p-ZF81rzjXSzJ6bpfwDjVDK34NOQLjKNKswlg_PcmA4v2dJE8Rf-P-G_-52Q69JFziFyEJkjIDv34fnVVSHg8lQEV2c3Rvd922IGwIqjMOOI39Hrih14Datk3ZpPhVfzfx5-NyBbTSFvw59PXwtswenzy6BP4natrqNi6PxQRrdwaeYzlkW5uLJiAJiDeF8gtv-aMZ3w",
+                    buttonText: "Visit Website",
+                    buttonIcon: "open_in_new",
+                    link: "https://www.waitomo.com/experiences/waitomo-glowworm-caves"
+                },
+                {
+                    title: "Aranui Cave",
+                    distance: "9.9 km",
+                    description: "A dry cave featuring stunning stalactites, stalagmites, and unique formations. A walking tour for all ages.",
+                    image: "https://images.unsplash.com/photo-1504699439244-a04f5df7ed98?w=800",
+                    buttonText: "Visit Website",
+                    buttonIcon: "open_in_new",
+                    link: "https://www.waitomo.com/experiences/aranui-cave"
+                },
+                {
+                    title: "Hamilton Airport",
+                    distance: "42.9 km",
+                    description: "The nearest regional airport with connections to major New Zealand cities and international flights.",
+                    image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800",
+                    buttonText: "View on Map",
+                    buttonIcon: "flight",
+                    link: "https://www.google.com/maps/search/?api=1&query=Hamilton+Airport+New+Zealand"
+                },
+                {
+                    title: "Taupo Airport",
+                    distance: "96.4 km",
+                    description: "Alternative airport option located near Lake Taupo, serving domestic New Zealand destinations.",
+                    image: "https://images.unsplash.com/photo-1529074963764-98f45c47344b?w=800",
+                    buttonText: "View on Map",
+                    buttonIcon: "flight",
+                    link: "https://www.google.com/maps/search/?api=1&query=Taupo+Airport+New+Zealand"
+                }
+            ];
+
+            const scrollRef = React.useRef(null);
+
+            const scroll = (direction) => {
+                if (scrollRef.current) {
+                    const scrollAmount = 300;
+                    scrollRef.current.scrollBy({
+                        left: direction === 'left' ? -scrollAmount : scrollAmount,
+                        behavior: 'smooth'
+                    });
+                }
+            };
+
             return (
-                <div className="flex flex-col min-h-screen">
-                    <section className="relative h-[60vh] min-h-[500px] w-full flex items-center justify-center overflow-hidden">
-                        <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5)), url("https://lh3.googleusercontent.com/aida-public/AB6AXuCE1wUaav_HQPR2vEw6muqgyfLovYow2i3W1NVUP5UqRKjPWrsjTgJKuSJEBJk6GBVy4Z8rlZVMCOviizSZiiRa5ybpner6-Ccq3pIJIARe28MdZdPB14UEhxd-mvxdiBZekYpYcxBuGsM4rNf9cbRfDH5o7FEik8iwbyqzfrPsLt1jHVAnTy7e2RkjCb3rWa-0BPaVn5B9YEsAqKXntfEcmUIG9HDEN_exoceauQyL_VPpZLxsZKmOOt2uhfZun1yTpQFp20Ex")' }}>
-                        </div>
-                        <div className="relative z-10 flex flex-col items-center gap-4 text-center px-4 max-w-4xl">
-                            <span className="inline-block px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm text-white text-xs font-bold tracking-wider uppercase mb-2">Local Guide</span>
-                            <h1 className="text-white text-5xl md:text-6xl font-black leading-tight tracking-[-0.033em]">
-                                Explore Our Backyard
-                            </h1>
-                            <p className="text-white/90 text-lg md:text-xl font-light leading-relaxed max-w-2xl">
-                                Discover the magic of Otorohanga. From subterranean wonders to lush golf courses, adventure is just minutes from your door.
-                            </p>
-                            <div className="mt-6 animate-bounce text-white">
-                                <span className="material-symbols-outlined">keyboard_arrow_down</span>
-                            </div>
-                        </div>
-                    </section>
-                    <div className="px-4 md:px-40 py-16 bg-surface-light dark:bg-surface-dark">
-                        <div className="max-w-[960px] mx-auto text-center mb-12">
-                            <h2 className="text-3xl md:text-4xl font-bold leading-tight tracking-[-0.015em] mb-4 text-text-main dark:text-white">Waitomo Wonders</h2>
+                <div id="attractions" className="bg-surface-light dark:bg-surface-dark py-16">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="text-center mb-10">
+                            <h2 className="text-3xl md:text-4xl font-bold leading-tight tracking-[-0.015em] mb-4 text-text-main dark:text-white">Attractions</h2>
                             <div className="h-1 w-20 bg-primary mx-auto rounded-full"></div>
-                            <p className="mt-4 text-text-muted dark:text-gray-400 text-lg">Curated experiences within a short drive from your suite.</p>
+                            <p className="mt-4 text-text-muted dark:text-gray-400 text-lg max-w-2xl mx-auto">Curated experiences within a short drive from your suite.</p>
                         </div>
-                        <div className="flex flex-col gap-12 max-w-[960px] mx-auto">
-                            {/* Attraction 1 */}
-                            <article className="group">
-                                <div className="flex flex-col md:flex-row items-stretch overflow-hidden rounded-xl shadow-lg bg-white dark:bg-[#1a2e1a] transition-transform hover:-translate-y-1 duration-300">
-                                    <div className="w-full md:w-1/2 min-h-[300px] bg-cover bg-center" style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuC4JRq4c_B9neShV4vWDgA-q-034VjqK0w_M5Sn2QF6-oqKLHLCj0Zo9p-dsfugv6Z4p-ZF81rzjXSzJ6bpfwDjVDK34NOQLjKNKswlg_PcmA4v2dJE8Rf-P-G_-52Q69JFziFyEJkjIDv34fnVVSHg8lQEV2c3Rvd922IGwIqjMOOI39Hrih14Datk3ZpPhVfzfx5-NyBbTSFvw59PXwtswenzy6BP4natrqNi6PxQRrdwaeYzlkW5uLJiAJiDeF8gtv-aMZ3w")' }}>
-                                    </div>
-                                    <div className="flex w-full md:w-1/2 flex-col justify-center p-8 gap-4">
-                                        <div className="flex justify-between items-start">
-                                            <h3 className="text-2xl font-bold text-text-main dark:text-white leading-tight">Waitomo Glow Worm Caves</h3>
-                                            <div className="flex items-center gap-1 bg-primary/10 text-primary px-2 py-1 rounded text-xs font-bold whitespace-nowrap">
-                                                <span className="material-symbols-outlined text-[16px]">distance</span>
-                                                6.6 miles
+
+                        {/* Horizontal Scrollable Container with Navigation */}
+                        <div className="relative group/carousel">
+                            {/* Left Navigation Button */}
+                            <button
+                                onClick={() => scroll('left')}
+                                className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white dark:bg-[#1a2e1a] rounded-full shadow-lg hidden md:flex items-center justify-center hover:bg-primary hover:text-white transition-all duration-200 border border-gray-100 dark:border-gray-700 -ml-4 opacity-0 group-hover/carousel:opacity-100 md:opacity-100"
+                                aria-label="Scroll left"
+                            >
+                                <span className="material-symbols-outlined">chevron_left</span>
+                            </button>
+
+                            {/* Right Navigation Button */}
+                            <button
+                                onClick={() => scroll('right')}
+                                className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white dark:bg-[#1a2e1a] rounded-full shadow-lg hidden md:flex items-center justify-center hover:bg-primary hover:text-white transition-all duration-200 border border-gray-100 dark:border-gray-700 -mr-4 opacity-0 group-hover/carousel:opacity-100 md:opacity-100"
+                                aria-label="Scroll right"
+                            >
+                                <span className="material-symbols-outlined">chevron_right</span>
+                            </button>
+
+                            {/* Scrollable Cards Container */}
+                            <div
+                                ref={scrollRef}
+                                className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory px-2"
+                                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                            >
+                                {attractions.map((attraction, idx) => (
+                                    <article key={idx} className="flex-shrink-0 w-[280px] snap-start group">
+                                        <div className="flex flex-col h-full overflow-hidden rounded-xl shadow-lg bg-white dark:bg-[#1a2e1a] transition-all hover:-translate-y-1 hover:shadow-xl duration-300">
+                                            <div className="h-[160px] bg-cover bg-center relative" style={{ backgroundImage: `url("${attraction.image}")` }}>
+                                                <div className="absolute top-3 right-3 flex items-center gap-1 bg-white/95 backdrop-blur-sm text-primary px-2.5 py-1 rounded-full text-xs font-bold shadow-sm">
+                                                    <span className="material-symbols-outlined text-[14px]">distance</span>
+                                                    {attraction.distance}
+                                                </div>
+                                            </div>
+                                            <div className="flex flex-col flex-1 p-4 gap-2">
+                                                <h3 className="text-base font-bold text-text-main dark:text-white leading-tight">{attraction.title}</h3>
+                                                <p className="text-text-muted dark:text-gray-300 text-xs font-normal leading-relaxed flex-1">
+                                                    {attraction.description}
+                                                </p>
+                                                <a href={attraction.link} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex items-center justify-center h-9 px-4 rounded-lg bg-primary text-text-main font-bold text-xs hover:brightness-110 transition-all gap-1.5">
+                                                    <span>{attraction.buttonText}</span>
+                                                    <span className="material-symbols-outlined text-[14px]">{attraction.buttonIcon}</span>
+                                                </a>
                                             </div>
                                         </div>
-                                        <p className="text-text-muted dark:text-gray-300 text-base font-normal leading-relaxed">
-                                            A world-famous subterranean adventure. Marvel at thousands of magical glowworms as you glide silently by boat through the Glowworm Grotto. Experience the serene ambiance of this geological masterpiece.
-                                        </p>
-                                        <div className="pt-4 mt-auto">
-                                            <button className="inline-flex items-center justify-center h-10 px-6 rounded-lg bg-primary text-text-main font-bold text-sm hover:brightness-110 transition-all gap-2">
-                                                <span>Visit Website</span>
-                                                <span className="material-symbols-outlined text-[18px]">open_in_new</span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </article>
-                            {/* Attraction 2 */}
-                            <article className="group">
-                                <div className="flex flex-col md:flex-row-reverse items-stretch overflow-hidden rounded-xl shadow-lg bg-white dark:bg-[#1a2e1a] transition-transform hover:-translate-y-1 duration-300">
-                                    <div className="w-full md:w-1/2 min-h-[300px] bg-cover bg-center" style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuCGsTuL_bWLOLEP-B5Da9mrxcHgPIdpvI5h-cs9b7Cx4zz3p1PHfqT-U6KDOaQCl6ITFYAzpyz9WMO3s8l6cp5M9J1TGLH8YqbdkxF30RayKoiYmuscPcAvjjCPz4XNu0GHqx5IflKgLs3pNqAtRsFMMXbU6gFqgDjfyzD8yoXbsWp8Tidv-iOYPxXK08f9hXpwZCKG07uRiiwyoojX9TlPxTeNhJIM-D0cTBFTu3Jv15LoWU4Sg3ZYH3Zx1k3Z8d-39ZKA4ydc")' }}>
-                                    </div>
-                                    <div className="flex w-full md:w-1/2 flex-col justify-center p-8 gap-4">
-                                        <div className="flex justify-between items-start">
-                                            <h3 className="text-2xl font-bold text-text-main dark:text-white leading-tight">Kiwi House & Native Bird Park</h3>
-                                            <div className="flex items-center gap-1 bg-primary/10 text-primary px-2 py-1 rounded text-xs font-bold whitespace-nowrap">
-                                                <span className="material-symbols-outlined text-[16px]">distance</span>
-                                                8.2 miles
-                                            </div>
-                                        </div>
-                                        <p className="text-text-muted dark:text-gray-300 text-base font-normal leading-relaxed">
-                                            See New Zealand's national bird up close in Otorohanga. A sanctuary for native wildlife including tuatara and kea. Learn about conservation efforts while walking through open-air aviaries.
-                                        </p>
-                                        <div className="pt-4 mt-auto">
-                                            <button className="inline-flex items-center justify-center h-10 px-6 rounded-lg bg-primary text-text-main font-bold text-sm hover:brightness-110 transition-all gap-2">
-                                                <span>Visit Website</span>
-                                                <span className="material-symbols-outlined text-[18px]">open_in_new</span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </article>
-                            {/* Attraction 3 */}
-                            <article className="group">
-                                <div className="flex flex-col md:flex-row items-stretch overflow-hidden rounded-xl shadow-lg bg-white dark:bg-[#1a2e1a] transition-transform hover:-translate-y-1 duration-300">
-                                    <div className="w-full md:w-1/2 min-h-[300px] bg-cover bg-center" style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuCTGmjA24yu-5khNrutsgB_ZbagL-ddj8J30NJPC0rKRJnX2r4kLLuMyjE50HZCLUV-s7yBr2AYLkc4VcRwE8lDTIJyCryYnd19JbOTygMTi2epkeAkJuFa_wyraHP79m9_kcl7cf2T89DqTES5GoDDLflSzblzOHxLHElFc-3450K5DXoigpzEf9zGg3BI3x31IWwgBQZR4ooUTElLoqRK7DkAt3ogm5w84nf6wC8AKc5tTfrBJxhezTi-7WAz2D63j5t41w3X")' }}>
-                                    </div>
-                                    <div className="flex w-full md:w-1/2 flex-col justify-center p-8 gap-4">
-                                        <div className="flex justify-between items-start">
-                                            <h3 className="text-2xl font-bold text-text-main dark:text-white leading-tight">Ruakuri Bush Walk</h3>
-                                            <div className="flex items-center gap-1 bg-primary/10 text-primary px-2 py-1 rounded text-xs font-bold whitespace-nowrap">
-                                                <span className="material-symbols-outlined text-[16px]">distance</span>
-                                                5.8 miles
-                                            </div>
-                                        </div>
-                                        <p className="text-text-muted dark:text-gray-300 text-base font-normal leading-relaxed">
-                                            A stunning native bush walk featuring dramatic limestone formations, caves, and native forest. This loop track is a must-do for nature lovers seeking a peaceful escape into the wild.
-                                        </p>
-                                        <div className="pt-4 mt-auto">
-                                            <button className="inline-flex items-center justify-center h-10 px-6 rounded-lg bg-primary text-text-main font-bold text-sm hover:brightness-110 transition-all gap-2">
-                                                <span>View Trail Map</span>
-                                                <span className="material-symbols-outlined text-[18px]">map</span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </article>
+                                    </article>
+                                ))}
+                            </div>
                         </div>
                     </div>
 
@@ -534,9 +888,9 @@
                                     <h2 className="text-2xl md:text-3xl font-bold text-text-main dark:text-white">Ready to explore?</h2>
                                     <p className="text-text-muted dark:text-gray-400">Reserve your suite at Waitomo Golfstays today.</p>
                                 </div>
-                                <Link to="/booking" className="flex min-w-[200px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-14 px-8 bg-primary text-text-main text-base font-bold shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all">
+                                <a onClick={() => scrollToSection('info')} className="flex min-w-[200px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-14 px-8 bg-primary text-text-main text-base font-bold shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all">
                                     <span className="truncate">Book Your Stay</span>
-                                </Link>
+                                </a>
                             </div>
                         </div>
                     </section>
@@ -547,11 +901,17 @@
         const ContactPage = () => {
             const handleSubmit = (e) => {
                 e.preventDefault();
-                alert("Thank you for your message. We will get back to you soon!");
+                const name = document.getElementById('name').value;
+                const email = document.getElementById('email').value;
+                const subject = document.getElementById('subject').value;
+                const message = document.getElementById('message').value;
+
+                const mailtoLink = `mailto:reservations@waitomogolfstays.co.nz?subject=${encodeURIComponent(subject + ' - from ' + name)}&body=${encodeURIComponent('From: ' + name + '\nEmail: ' + email + '\n\n' + message)}`;
+                window.location.href = mailtoLink;
             };
 
             return (
-                <main className="flex-grow w-full max-w-[1280px] mx-auto px-4 sm:px-10 lg:px-14 py-8 lg:py-12">
+                <main id="contact" className="flex-grow w-full max-w-[1280px] mx-auto px-4 sm:px-10 lg:px-14 py-8 lg:py-12">
                     <div className="mb-10 lg:mb-16 max-w-2xl">
                         <h1 className="text-[#0d1b0d] dark:text-white text-4xl lg:text-5xl font-black leading-tight tracking-[-0.033em] mb-4">
                             Get in Touch
@@ -563,33 +923,36 @@
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16">
                         <div className="lg:col-span-5 flex flex-col gap-10">
                             <div className="flex flex-col gap-4">
-                                <div className="flex items-center gap-4 bg-white dark:bg-[#152a15] p-4 rounded-xl border border-[#e7f3e7] dark:border-[#2a4e2a] shadow-sm transition-transform hover:-translate-y-1 duration-300">
-                                    <div className="text-[#0d1b0d] flex items-center justify-center rounded-lg bg-[#e7f3e7] dark:bg-[#2a4e2a] dark:text-white shrink-0 size-12">
+                                <a href="https://www.google.com/maps/search/?api=1&query=54+Golf+Road+Otorohanga+3977+New+Zealand" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 bg-white dark:bg-[#152a15] p-4 rounded-xl border border-[#e7f3e7] dark:border-[#2a4e2a] shadow-sm transition-all hover:-translate-y-1 hover:shadow-md hover:border-primary duration-300 cursor-pointer group">
+                                    <div className="text-[#0d1b0d] flex items-center justify-center rounded-lg bg-[#e7f3e7] dark:bg-[#2a4e2a] dark:text-white shrink-0 size-12 group-hover:bg-primary group-hover:text-white transition-colors">
                                         <span className="material-symbols-outlined">location_on</span>
                                     </div>
                                     <div className="flex-1">
                                         <p className="text-xs text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider mb-0.5">Address</p>
-                                        <p className="text-[#0d1b0d] dark:text-gray-100 text-base font-medium leading-normal">123 Golf Road, Otorohanga, NZ</p>
+                                        <p className="text-[#0d1b0d] dark:text-gray-100 text-base font-medium leading-normal group-hover:text-primary transition-colors">54 Golf Road, Otorohanga 3977, New Zealand</p>
                                     </div>
-                                </div>
-                                <div className="flex items-center gap-4 bg-white dark:bg-[#152a15] p-4 rounded-xl border border-[#e7f3e7] dark:border-[#2a4e2a] shadow-sm transition-transform hover:-translate-y-1 duration-300">
-                                    <div className="text-[#0d1b0d] flex items-center justify-center rounded-lg bg-[#e7f3e7] dark:bg-[#2a4e2a] dark:text-white shrink-0 size-12">
+                                    <span className="material-symbols-outlined text-gray-400 group-hover:text-primary transition-colors">open_in_new</span>
+                                </a>
+                                <a href="tel:+6478739190" className="flex items-center gap-4 bg-white dark:bg-[#152a15] p-4 rounded-xl border border-[#e7f3e7] dark:border-[#2a4e2a] shadow-sm transition-all hover:-translate-y-1 hover:shadow-md hover:border-primary duration-300 cursor-pointer group">
+                                    <div className="text-[#0d1b0d] flex items-center justify-center rounded-lg bg-[#e7f3e7] dark:bg-[#2a4e2a] dark:text-white shrink-0 size-12 group-hover:bg-primary group-hover:text-white transition-colors">
                                         <span className="material-symbols-outlined">call</span>
                                     </div>
                                     <div className="flex-1">
                                         <p className="text-xs text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider mb-0.5">Phone</p>
-                                        <p className="text-[#0d1b0d] dark:text-gray-100 text-base font-medium leading-normal">+64 7 123 4567</p>
+                                        <p className="text-[#0d1b0d] dark:text-gray-100 text-base font-medium leading-normal group-hover:text-primary transition-colors">+64 7 873 9190</p>
                                     </div>
-                                </div>
-                                <div className="flex items-center gap-4 bg-white dark:bg-[#152a15] p-4 rounded-xl border border-[#e7f3e7] dark:border-[#2a4e2a] shadow-sm transition-transform hover:-translate-y-1 duration-300">
-                                    <div className="text-[#0d1b0d] flex items-center justify-center rounded-lg bg-[#e7f3e7] dark:bg-[#2a4e2a] dark:text-white shrink-0 size-12">
+                                    <span className="material-symbols-outlined text-gray-400 group-hover:text-primary transition-colors">call</span>
+                                </a>
+                                <a href="mailto:reservations@waitomogolfstays.co.nz" className="flex items-center gap-4 bg-white dark:bg-[#152a15] p-4 rounded-xl border border-[#e7f3e7] dark:border-[#2a4e2a] shadow-sm transition-all hover:-translate-y-1 hover:shadow-md hover:border-primary duration-300 cursor-pointer group">
+                                    <div className="text-[#0d1b0d] flex items-center justify-center rounded-lg bg-[#e7f3e7] dark:bg-[#2a4e2a] dark:text-white shrink-0 size-12 group-hover:bg-primary group-hover:text-white transition-colors">
                                         <span className="material-symbols-outlined">mail</span>
                                     </div>
                                     <div className="flex-1 overflow-hidden">
                                         <p className="text-xs text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider mb-0.5">Email</p>
-                                        <p className="text-[#0d1b0d] dark:text-gray-100 text-base font-medium leading-normal truncate" title="reservations@waitomogolfstays.co.nz">reservations@waitomogolfstays.co.nz</p>
+                                        <p className="text-[#0d1b0d] dark:text-gray-100 text-base font-medium leading-normal truncate group-hover:text-primary transition-colors" title="reservations@waitomogolfstays.co.nz">reservations@waitomogolfstays.co.nz</p>
                                     </div>
-                                </div>
+                                    <span className="material-symbols-outlined text-gray-400 group-hover:text-primary transition-colors">mail</span>
+                                </a>
                             </div>
                             <div className="h-px bg-[#e7f3e7] dark:bg-[#2a4e2a] w-full"></div>
                             <div>
@@ -625,17 +988,26 @@
                             </div>
                         </div>
                         <div className="lg:col-span-7 h-[500px] lg:h-auto min-h-[500px] relative group rounded-2xl overflow-hidden shadow-lg border border-[#e7f3e7] dark:border-[#2a4e2a]">
-                            <div className="absolute inset-0 bg-gray-200 dark:bg-gray-800 flex items-center justify-center">
-                                <img alt="Map view of Otorohanga countryside" className="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYHFaoeB_DgkwFbROvBrlYjQmDtgSap1x6ECQdXzU_TT60D_-HRVWb3Vs9s0Li93MN1mG8jhBTYN4I6saIndRAwc-xoXBamRJCnTHUtPbBuo6Zq4gu0ukcYPmbIsBcNWEkMdTFOHOr_Wvr_ZuvNgiGpReOUau--NwyhyS_c-a8LQVoxXUQwxvKVLWSg8O6tag_ftwth8_2I7Iq0_Qo0uWN7pm0tKBh6RI3wa92hh9ltum8LEqsHTNMq0cdiH3KLwfVkLwZADV_" />
-                            </div>
-                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center drop-shadow-xl z-10 pointer-events-none">
-                                <div className="bg-primary text-[#0d1b0d] rounded-full p-2 animate-bounce">
-                                    <span className="material-symbols-outlined text-3xl">home_pin</span>
-                                </div>
-                                <div className="bg-white dark:bg-[#102210] text-[#0d1b0d] dark:text-white px-3 py-1 rounded-full mt-2 text-xs font-bold shadow-sm whitespace-nowrap">
-                                    We are here
-                                </div>
-                            </div>
+                            {/* Embedded Google Map */}
+                            <iframe
+                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3145.8!2d175.2067!3d-38.1833!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6d6c9e0c0c0c0c0c%3A0x0!2s54%20Golf%20Road%2C%20Otorohanga%203977%2C%20New%20Zealand!5e0!3m2!1sen!2snz!4v1704900000000!5m2!1sen!2snz"
+                                className="w-full h-full border-0"
+                                allowFullScreen=""
+                                loading="lazy"
+                                referrerPolicy="no-referrer-when-downgrade"
+                                title="Waitomo Golfstays B&B Location"
+                            ></iframe>
+
+                            {/* Clickable overlay for full map */}
+                            <a
+                                href="https://www.google.com/maps/search/?api=1&query=54+Golf+Road+Otorohanga+3977+New+Zealand"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="absolute bottom-4 right-4 bg-white dark:bg-[#1a2e1a] text-[#0d1b0d] dark:text-white px-4 py-2 rounded-lg shadow-lg font-bold text-sm flex items-center gap-2 hover:bg-primary hover:text-white transition-colors z-10"
+                            >
+                                <span className="material-symbols-outlined text-lg">open_in_new</span>
+                                View Larger Map
+                            </a>
                         </div>
                     </div>
                 </main>
@@ -644,126 +1016,96 @@
 
         const BookingPage = () => {
             return (
-                <main>
-                    <section className="relative w-full min-h-[500px] flex items-center justify-center bg-cover bg-center bg-no-repeat" style={{ backgroundImage: 'linear-gradient(rgba(16, 34, 16, 0.4) 0%, rgba(16, 34, 16, 0.7) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuCuNko61-ADIepsW0HFWYZi_BhNUtNcJ9qS6sLyOVwC70luzkux6UUvSlOm7DwQQITXoDB356QcY2cbgWiX5rMgRzpHkAbIz4EScFH591LHeIz3vHrxBnYVtD4v787CM_NULBJaBXHwkrtQg_KFVZ8yT9mnVLWSuqzuty6-jTHQ4yzqPhOnqGyXiuddBUYyxV395d5FhLw5neSdAKObi6Lhc4x_iLfTmfoU42xo6LC7dE64SLTBNCCGGjR_ngfxydluLv3QyPr5")' }}>
-                        <div className="container mx-auto px-4 max-w-[960px] text-center relative z-10">
-                            <h1 className="text-white text-4xl md:text-5xl lg:text-6xl font-black leading-tight tracking-[-0.033em] mb-4 drop-shadow-lg">
-                                Secure Your Stay at Waitomo Golfstays
-                            </h1>
-                            <p className="text-gray-100 text-base md:text-lg font-normal leading-relaxed max-w-2xl mx-auto mb-8 drop-shadow-md">
-                                Experience tranquility in the heart of Otorohanga. Choose your preferred booking method below to begin your peaceful adults-only getaway.
-                            </p>
-                            <a className="inline-flex items-center justify-center h-12 px-8 bg-primary text-[#0d1b0d] rounded-lg text-base font-bold hover:bg-white hover:text-primary transition-all duration-300 shadow-lg" href="#booking-options">
-                                Check Availability
-                            </a>
-                        </div>
-                    </section>
+                <main id="info" className="bg-background-light dark:bg-background-dark">
+                    <section className="py-16 md:py-20 relative overflow-hidden">
+                        {/* Animated Background */}
+                        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/10"></div>
 
-                    <section className="py-16 md:py-24 bg-background-light dark:bg-background-dark" id="booking-options">
-                        <div className="container mx-auto px-4 max-w-[1100px]">
+                        {/* Floating Decorative Elements */}
+                        <div className="absolute top-10 left-10 w-20 h-20 bg-primary/10 rounded-full blur-xl animate-pulse"></div>
+                        <div className="absolute bottom-20 right-20 w-32 h-32 bg-primary/10 rounded-full blur-2xl" style={{ animation: 'pulse 3s ease-in-out infinite' }}></div>
+                        <div className="absolute top-1/2 left-1/4 w-16 h-16 bg-primary/5 rounded-full blur-lg" style={{ animation: 'pulse 4s ease-in-out infinite 1s' }}></div>
+
+                        <div className="container mx-auto px-4 max-w-[1100px] relative z-10">
                             <div className="text-center mb-12">
-                                <h2 className="text-[#0d1b0d] dark:text-white text-3xl md:text-4xl font-bold tracking-tight mb-4">Select Your Booking Platform</h2>
-                                <p className="text-gray-600 dark:text-gray-300 text-lg max-w-2xl mx-auto">
-                                    We offer multiple ways to book your stay. Choose the platform that suits you best.
+                                {/* Animated Badge */}
+                                <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/30 rounded-full px-4 py-2 mb-6" style={{ animation: 'bounce 2s ease-in-out infinite' }}>
+                                    <span className="relative flex h-3 w-3">
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                                        <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
+                                    </span>
+                                    <span className="text-sm font-bold text-primary">Limited Availability</span>
+                                </div>
+
+                                <h2 className="text-[#0d1b0d] dark:text-white text-3xl md:text-5xl font-bold tracking-tight mb-4">
+                                    Book Your Stay
+                                </h2>
+                                <div className="h-1 w-20 bg-primary mx-auto rounded-full mb-4" style={{ animation: 'pulse 2s ease-in-out infinite' }}></div>
+                                <p className="mt-4 text-gray-600 dark:text-gray-300 text-lg max-w-2xl mx-auto">
+                                    Choose your preferred booking method. We offer multiple ways to reserve your room.
                                 </p>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
-                                <div className="group relative flex flex-col bg-white dark:bg-[#1a2e1a] rounded-xl shadow-xl overflow-hidden border-2 border-primary transform hover:-translate-y-1 transition-all duration-300">
-                                    <div className="absolute top-0 right-0 bg-primary text-[#0d1b0d] text-xs font-bold px-3 py-1 rounded-bl-lg z-10">
+                                {/* Book Directly - Featured Card */}
+                                <div className="group relative flex flex-col bg-gradient-to-br from-white to-primary/5 dark:from-[#1a2e1a] dark:to-primary/10 rounded-xl shadow-lg shadow-primary/20 overflow-hidden border-2 border-primary p-6 hover:-translate-y-2 transition-all duration-300 animate-float">
+                                    {/* Shimmer Effect Overlay */}
+                                    <div className="absolute inset-0 animate-shimmer pointer-events-none"></div>
+
+                                    <div className="absolute top-0 right-0 bg-primary text-[#0d1b0d] text-xs font-bold px-3 py-1 rounded-bl-lg flex items-center gap-1">
+                                        <span className="material-symbols-outlined text-sm">star</span>
                                         BEST VALUE
                                     </div>
-                                    <div className="h-48 w-full bg-cover bg-center" style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuC7Ok8Ph7tsr5qr5e_8lDFRgT_NJOS6V7qX55W3dBL2A0QPyiSgGI4LoUUsywV_MLABiX3lyHex3IVfUO4NNios8v3degA_CXJjHdH4fym1OHmGtf425wDnyMXMge5kCFWUiKftNjvkMqSdXEVoNN8RN6ba4VArzVEtjOWLZFYfroSfdE9_BnKN_JNU7GhcXsSb6loICrGCziQbUrdGs89sqNgPaUcsVedz_awAHTNAJmNksXGNea3Wv5yvCnKcWd_TsT2OvTmC")' }}>
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                                        <div className="absolute bottom-4 left-4 text-white flex items-center gap-2">
-                                            <span className="material-symbols-outlined filled">verified</span>
-                                            <span className="font-bold">Direct Enquiry</span>
+                                    <div className="flex items-center gap-3 mb-4 relative z-10">
+                                        <div className="bg-primary/20 p-3 rounded-lg relative">
+                                            <span className="material-symbols-outlined text-primary text-2xl">verified</span>
+                                            {/* Pulse ring effect */}
+                                            <div className="absolute inset-0 rounded-lg bg-primary/30" style={{ animation: 'pulse-ring 2s ease-out infinite' }}></div>
                                         </div>
+                                        <h3 className="text-xl font-bold dark:text-white">Book Directly</h3>
                                     </div>
-                                    <div className="p-6 flex flex-col flex-1">
-                                        <h3 className="text-xl font-bold mb-2 dark:text-white">Book Directly</h3>
-                                        <p className="text-sm text-gray-600 dark:text-gray-300 mb-6 flex-1">
-                                            Contact us directly for a personal touch and our best rate guarantee. No booking fees.
-                                        </p>
-                                        <button className="w-full h-12 rounded-lg bg-primary text-[#0d1b0d] font-bold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
-                                            <span className="material-symbols-outlined">mail</span> Contact Us
-                                        </button>
-                                    </div>
-                                </div>
-                                <div className="group flex flex-col bg-white dark:bg-[#1a2e1a] rounded-xl shadow-md border border-gray-100 dark:border-gray-800 hover:shadow-lg transition-all duration-300">
-                                    <div className="h-48 w-full bg-cover bg-center relative" style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuB2BqmBr0XIYxludswiQ2gG6BLQLcmwQJrV0PhXjDXnyTw6Ck3JMHVPw3Ya0WYQn5HTpRhWIJulcrfxPOEqcjkec5It7JZ8ETf_IXhZPbIaTnaDzD3koPkATWff7U2qLutqufuU1vMb7_xxRIVpkGjy98F4spDqNFC9A3fgAiFN-CCT4vby7tEwh_nrb7GmxRr11XxYJMKgXLjOJiwwuWea-_7Ne2ydigmLlbeeXNWgybcBr76jzkddtOLTynAdPVm0hUvnMkBa")' }}>
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-                                        <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-2 py-1 rounded flex items-center gap-1">
-                                            <span className="material-symbols-outlined text-[#FF5A5F] text-sm">star</span>
-                                            <span className="text-xs font-bold text-gray-900">Superhost</span>
-                                        </div>
-                                    </div>
-                                    <div className="p-6 flex flex-col flex-1">
-                                        <h3 className="text-xl font-bold mb-2 dark:text-white">Airbnb</h3>
-                                        <p className="text-sm text-gray-600 dark:text-gray-300 mb-6 flex-1">
-                                            Perfect for verified reviews and instant confirmation on a trusted global platform.
-                                        </p>
-                                        <button className="w-full h-12 rounded-lg border border-gray-200 dark:border-gray-700 text-[#0d1b0d] dark:text-white font-bold hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors flex items-center justify-center gap-2">
-                                            Book on Airbnb <span className="material-symbols-outlined text-sm">open_in_new</span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div className="group flex flex-col bg-white dark:bg-[#1a2e1a] rounded-xl shadow-md border border-gray-100 dark:border-gray-800 hover:shadow-lg transition-all duration-300">
-                                    <div className="h-48 w-full bg-cover bg-center relative" style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDbYSlLvdm8sO9zT5eizN0SExLMenwWjdhKW8j8xH5rqSUoB6ZMr2IpUpg0m3iAsZ3xnjxWA0gOMETtrY1kP5jOxtg-8aJ6DN2GwiZM17aGxHXDxInGzEqi59Ob8f1M3MUAJBlTVF2Er7HfukdQcYW0k0B3CDQLxAxJInLRuo3hDi1IV0AcUFBbhNqJeQvYPD2LEqUYiVxrAhICpCrZLiH28RbXEiPhiLyaPZYSIwLOBFOKKb-aFIoY181c8W0IZ1OcsYFmAtvM")' }}>
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-                                        <div className="absolute top-4 right-4 bg-[#003580] text-white px-2 py-1 rounded text-xs font-bold">
-                                            9.8 / 10
-                                        </div>
-                                    </div>
-                                    <div className="p-6 flex flex-col flex-1">
-                                        <h3 className="text-xl font-bold mb-2 dark:text-white">Booking.com</h3>
-                                        <p className="text-sm text-gray-600 dark:text-gray-300 mb-6 flex-1">
-                                            Ideal for Genius members. Flexible cancellation options available for your peace of mind.
-                                        </p>
-                                        <button className="w-full h-12 rounded-lg border border-gray-200 dark:border-gray-700 text-[#0d1b0d] dark:text-white font-bold hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors flex items-center justify-center gap-2">
-                                            Book on Booking.com <span className="material-symbols-outlined text-sm">open_in_new</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <section className="py-16 bg-white dark:bg-[#152915]">
-                        <div className="container mx-auto px-4 max-w-[960px]">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-                                <div>
-                                    <h3 className="text-primary font-bold uppercase tracking-wider text-sm mb-2">Why Stay With Us?</h3>
-                                    <h2 className="text-3xl md:text-4xl font-bold text-[#0d1b0d] dark:text-white mb-6">A Premium Boutique Experience</h2>
-                                    <p className="text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
-                                        Nestled in the lush landscapes of Otorohanga, we offer more than just a room. We provide a sanctuary designed for adults seeking peace, luxury, and perhaps a round of golf.
+                                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-6 flex-1 relative z-10">
+                                        Reach out to us directly for enquiries, special requests, or to discuss your stay. We're happy to assist.
                                     </p>
-                                    <div className="grid grid-cols-2 gap-6">
-                                        {[
-                                            { icon: "person_off", title: "Adults Only", sub: "Strictly 18+ environment" },
-                                            { icon: "golf_course", title: "Golf Access", sub: "Direct course access" },
-                                            { icon: "wifi", title: "Free Wifi", sub: "High-speed connection" },
-                                            { icon: "bakery_dining", title: "Breakfast", sub: "Included daily" }
-                                        ].map((item, idx) => (
-                                            <div key={idx} className="flex items-start gap-3">
-                                                <div className="bg-primary/10 p-2 rounded-lg text-primary">
-                                                    <span className="material-symbols-outlined">{item.icon}</span>
-                                                </div>
-                                                <div>
-                                                    <h4 className="font-bold text-[#0d1b0d] dark:text-white">{item.title}</h4>
-                                                    <p className="text-xs text-gray-500 dark:text-gray-400">{item.sub}</p>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
+                                    <button onClick={() => scrollToSection('contact')} className="relative z-10 w-full h-12 rounded-lg bg-primary text-[#0d1b0d] font-bold hover:bg-primary/90 hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-primary/30">
+                                        <span className="material-symbols-outlined">mail</span> Contact Us
+                                    </button>
                                 </div>
-                                <div className="relative h-[400px] rounded-2xl overflow-hidden shadow-2xl" style={{ backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDKqmJILosJxhejbNQARKX5Ypb_FeDzxuI6ReZVNOPoY9XhcVNUknc7V6a9clU0cTQns7uo2CJHSskVyVsx801GKQsrOAxCIGg-s0tLsZDZ0nQk8d92vrlcJLQ3mXAq3O_IhEr7R3h4Anjt_-aTMFSvfZ6_4UAzOx_lgbzyG9aShQORzknoTIU0QSA_yqB3VHTS2DbH_6XRTzWhTnEeZXZN1irFZ20f831w2yHnLAAEir5io4r_3NYE1mGv76eBjH3VLrYdR8zm")', backgroundSize: 'cover', backgroundPosition: 'center' }}>
-                                    <div className="absolute bottom-6 left-6 right-6 bg-white/95 dark:bg-[#1a2e1a]/95 backdrop-blur p-4 rounded-xl shadow-lg border-l-4 border-primary">
-                                        <div className="flex gap-1 text-primary mb-2">
-                                            {[1, 2, 3, 4, 5].map(i => <span key={i} className="material-symbols-outlined text-sm">star</span>)}
+                                <div className="group flex flex-col bg-white dark:bg-[#1a2e1a] rounded-xl shadow-md border border-gray-100 dark:border-gray-800 p-6 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                                    <div className="flex items-center gap-3 mb-4">
+                                        <div className="p-2 rounded-lg">
+                                            <img src="agoda-logo.png" alt="Agoda" className="h-8 w-auto" />
                                         </div>
-                                        <p className="text-sm font-medium italic text-gray-800 dark:text-gray-200">"The most relaxing weekend we've had in years. The views are stunning and the hosts are wonderful."</p>
-                                        <p className="text-xs text-gray-500 mt-2 font-bold uppercase">— Sarah & James, Auckland</p>
+                                        <div>
+                                            <h3 className="text-xl font-bold dark:text-white">Agoda</h3>
+                                            <span className="text-xs font-bold text-[#5C2D91]">Trusted Partner</span>
+                                        </div>
                                     </div>
+                                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-6 flex-1">
+                                        Book through Agoda for easy online booking and access to their rewards programme.
+                                    </p>
+                                    <a href="https://www.agoda.com/waitomo-golfstays-b-b/hotel/all/waitomo-nz.html" target="_blank" rel="noopener noreferrer" className="w-full h-12 rounded-lg border border-gray-200 dark:border-gray-700 text-[#0d1b0d] dark:text-white font-bold hover:bg-[#5C2D91] hover:text-white hover:border-[#5C2D91] transition-colors flex items-center justify-center gap-2">
+                                        Book on Agoda <span className="material-symbols-outlined text-sm">open_in_new</span>
+                                    </a>
+                                </div>
+                                <div className="group flex flex-col bg-white dark:bg-[#1a2e1a] rounded-xl shadow-md border border-gray-100 dark:border-gray-800 p-6 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                                    <div className="flex items-center gap-3 mb-4">
+                                        <div className="p-2 rounded-lg">
+                                            <svg className="h-8 w-8" viewBox="0 0 24 24" fill="none">
+                                                <rect width="24" height="24" rx="4" fill="#003580" />
+                                                <path d="M6 6h5.5c2.5 0 4 1.2 4 3.3 0 1.4-.8 2.4-2 2.8v.1c1.5.3 2.5 1.5 2.5 3.1 0 2.3-1.7 3.7-4.5 3.7H6V6zm3 5h2c1.2 0 1.8-.5 1.8-1.4 0-.9-.6-1.4-1.8-1.4H9V11zm0 5.8h2.3c1.3 0 2-.6 2-1.6s-.7-1.5-2-1.5H9v3.1z" fill="white" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <h3 className="text-xl font-bold dark:text-white">Booking.com</h3>
+                                            <span className="text-xs font-bold text-[#003580]">Highly Rated</span>
+                                        </div>
+                                    </div>
+                                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-6 flex-1">
+                                        Book through Booking.com with Genius benefits and flexible cancellation options.
+                                    </p>
+                                    <a href="https://www.booking.com/hotel/nz/waitomo-golfstays-b-amp-b.en-gb.html" target="_blank" rel="noopener noreferrer" className="w-full h-12 rounded-lg border border-gray-200 dark:border-gray-700 text-[#0d1b0d] dark:text-white font-bold hover:bg-[#003580] hover:text-white hover:border-[#003580] transition-colors flex items-center justify-center gap-2">
+                                        Book on Booking.com <span className="material-symbols-outlined text-sm">open_in_new</span>
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -795,8 +1137,8 @@
                                     </summary>
                                     <div className="px-5 pb-5 text-gray-600 dark:text-gray-300 text-sm leading-relaxed border-t border-gray-50 dark:border-gray-800 pt-3">
                                         <ul className="list-disc pl-4 space-y-1">
-                                            <li><strong>Check-in:</strong> 3:00 PM - 8:00 PM. Late check-in available upon request.</li>
-                                            <li><strong>Check-out:</strong> By 11:00 AM.</li>
+                                            <li><strong>Check-in:</strong> 2:00 PM - 7:00 PM (14:00 - 19:00)</li>
+                                            <li><strong>Check-out:</strong> 7:00 AM - 10:00 AM (07:00 - 10:00)</li>
                                         </ul>
                                     </div>
                                 </details>
@@ -830,22 +1172,69 @@
                 </main>
             );
         };
+        // Scroll to Top Button Component
+        const ScrollToTopButton = () => {
+            const [isVisible, setIsVisible] = useState(false);
+
+            useEffect(() => {
+                const toggleVisibility = () => {
+                    if (window.scrollY > 300) {
+                        setIsVisible(true);
+                    } else {
+                        setIsVisible(false);
+                    }
+                };
+
+                window.addEventListener('scroll', toggleVisibility);
+                return () => window.removeEventListener('scroll', toggleVisibility);
+            }, []);
+
+            const scrollToTop = () => {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            };
+
+            return (
+                <button
+                    onClick={scrollToTop}
+                    className={`fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full bg-primary text-[#0d1b0d] shadow-lg hover:bg-primary/90 hover:scale-110 transition-all duration-300 flex items-center justify-center ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}
+                    aria-label="Scroll to top"
+                >
+                    <span className="material-symbols-outlined">keyboard_arrow_up</span>
+                </button>
+            );
+        };
 
         const App = () => {
+            const [privacyModalOpen, setPrivacyModalOpen] = useState(false);
+            const [termsModalOpen, setTermsModalOpen] = useState(false);
+
             return (
-                <MemoryRouter>
-                    <div className="flex flex-col min-h-screen">
-                        <TopBar />
-                        <Header />
-                        <Routes>
-                            <Route path="/" element={<HomePage />} />
-                            <Route path="/attractions" element={<AttractionsPage />} />
-                            <Route path="/contact" element={<ContactPage />} />
-                            <Route path="/booking" element={<BookingPage />} />
-                        </Routes>
-                        <Footer />
-                    </div>
-                </MemoryRouter>
+                <div className="flex flex-col min-h-screen">
+                    <TopBar />
+                    <Header />
+                    <HomePage />
+                    <AttractionsPage />
+                    <ContactPage />
+                    <BookingPage />
+                    <Footer
+                        onOpenPrivacy={() => setPrivacyModalOpen(true)}
+                        onOpenTerms={() => setTermsModalOpen(true)}
+                    />
+
+                    {/* Scroll to Top Button */}
+                    <ScrollToTopButton />
+
+                    {/* Legal Modals */}
+                    <Modal isOpen={privacyModalOpen} onClose={() => setPrivacyModalOpen(false)} title="Privacy Policy">
+                        <PrivacyPolicyContent />
+                    </Modal>
+                    <Modal isOpen={termsModalOpen} onClose={() => setTermsModalOpen(false)} title="Terms of Service">
+                        <TermsOfServiceContent />
+                    </Modal>
+                </div>
             );
         };
 
